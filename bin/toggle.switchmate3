@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+var Switchmate3Device = require('../index').Switchmate3Device;
+(validateArgs()) ? createToggleSession() : displayUsage();
+
+/**
+ * Validate commandline arguments.
+ * @returns {Boolean} True on valid, false on invalid.
+ */
+function validateArgs()
+{
+    var valid = (process.argv.length>=4);
+    var invalidDataType = (typeof process.argv[2] === 'undefined' ||  typeof process.argv[3] === 'undefined');
+    valid = valid && !invalidDataType;
+    valid = valid && (process.argv[3] === 'on' || process.argv[3] === 'off' || process.argv[3] === 'identify');
+    return valid;
+}
+
+/**
+ * Find the Switchmate3 and create the Toggle Session when found.
+ */
+function createToggleSession()
+{
+    var sm_id = process.argv[2].toLowerCase();
+    console.log('Locating '+sm_id+'.');
+    Switchmate3Device.discoverById(sm_id, onFound);
+}
+
+/**
+ * Display command line usage, then exit.
+ */
+function displayUsage()
+{
+    console.log('Usage for toggle.switchmate3:');
+    console.log('Set Switchmate3 to a certain target state (on, off, identify)\n');
+    console.log('toggle.switchmate3 <switchmate3_id> <target_state>\n');
+    process.exit();
+}
+
+function onFound(Switchmate3)
+{
+    console.log('found');
+    var targetState = process.argv[3];
+    var ToggleMode = Switchmate3.ToggleMode();
+    //ToggleMode = new Switchmate3Toggle(Switchmate3);
+
+    ToggleMode.event.on('msg', function (msg)
+    {
+        console.log(msg);
+    }); //set event listener for logging.
+    ToggleMode.event.on('success',onSuccess);
+    ToggleMode.event.on('fail', onFail);
+    if (targetState === 'identify')
+    {
+        ToggleMode.IdentifySwitchmate3();
+    }
+    else
+    {
+        (targetState === 'on') ? ToggleMode.TurnOn() : ToggleMode.TurnOff();
+    }
+}
+
+function onSuccess()
+{
+    console.log('Success!');
+    process.exit();
+}
+
+function onFail()
+{
+    console.log('Failed!');
+    process.exit();
+}

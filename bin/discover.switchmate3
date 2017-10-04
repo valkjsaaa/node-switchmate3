@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+var Switchmate3Device = require('../index').Switchmate3Device;
+console.log("Discovering Switchmates3.");
+console.log("Discovery will finish in 30 seconds.");
+Switchmate3Device.SCAN_DUPLICATES = false;
+var timeouts = 2;
+var onDiscover = function (sm)
+{
+    console.log('Switchmate3 found.');
+    console.log('{ "id" : "' + sm.id + '" }');
+};
+Switchmate3Device.discoverAll(onDiscover);
+
+setTimeout(DiscoveryTimeout, 15000);
+function DiscoveryTimeout()
+{
+    timeouts -= 1;
+    if (timeouts === 0)
+    {
+        Switchmate3Device.stopDiscoverAll(onDiscover);
+        console.log("Discovery ended.");
+        process.exit(0);
+    } else
+    {
+        console.log((timeouts * 15) + ' seconds left...');
+        setTimeout(DiscoveryTimeout, 15000);
+    }
+}

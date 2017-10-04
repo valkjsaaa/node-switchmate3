@@ -1,0 +1,24 @@
+{
+  "name": "node-switchmate3",
+  "version": "0.0.1",
+  "keywords": [
+    "switchmate",
+    "lights",
+    "automation"
+  ],
+  "author": "Jackie Yang",
+  "dependencies": {
+    "noble-device": ">=1.4.1"
+  },
+  "description": "A Node.js API for Switchmate3",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valkjsaaa/node-switchmate3.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/valkjsaaa/node-switchmate3/issues"
+  },
+  "homepage": "https://github.com/valkjsaaa/node-switchmate3"
+}

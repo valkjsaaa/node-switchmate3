@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+var Switchmate3Device = require('../index').Switchmate3Device;
+(validateArgs()) ?  createTestSession() : displayUsage();
+
+
+/**
+ * Validate commandline arguments.
+ * @returns {Boolean} True on valid, false on invalid.
+ */
+function validateArgs()
+{
+    var valid = (process.argv.length>=2);
+    var invalidDataType = (typeof process.argv[2] === 'undefined');
+    valid = valid && !invalidDataType;
+    return valid;
+}
+
+function createTestSession()
+{
+    var sm_id = process.argv[2].toLowerCase();
+    console.log('Finding ' + sm_id + '.');
+    /*var Discovery = new DiscoverySession();
+    Discovery.FindSwitchmate3(sm_id, onFound);*/
+    Switchmate3Device.discoverById(sm_id, onFound);
+}
+
+function displayUsage()
+{
+    console.log('Usage for pollingtest.js:');
+    console.log('Tests the state of the Switchmate3 during manual toggles.\n');
+    console.log('polling.switchmate3  <switchmate3_id>\n');
+    process.exit();
+}
+
+function onFound(Switchmate3)
+{
+    Switchmate3Device.stopDiscoverAll(onFound);
+    console.log('found');
+    Switchmate3.on('disconnect', function ()
+    {
+        console.log('disconnect');
+        Switchmate3.startPollingSwitchmate3();
+    });
+    Switchmate3.on('toggleStateChange', function (state, id)
+    {
+        console.log(id+' changed to ' + state);
+    });
+
+    Switchmate3.on('unreachable', function (id)
+    {
+        console.log(id+' is now unreachable.');
+    });
+
+    Switchmate3.on('reachable', function (id)
+    {
+        console.log(id + ' is now reachable.');
+    });
+    Switchmate3.connectAndSetup(function ()
+    {
+        console.log('connected');
+        Switchmate3.disconnect();
+    });
+}
